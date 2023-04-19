@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import com.api_rest.model.Building;
 import com.api_rest.repository.JpaBuildingRepository;
+
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -29,28 +32,48 @@ public class BuildingServices {
 	
 	// Jpa methods
 	
-	public void persistBuilding(Building b) {
-		repoBuilding.save(b);
-		log.info("Building correctly persisted on DB");
+	public String persistBuilding(Building b) {
+		if (!repoBuilding.existsByName(b.getName())) {
+			repoBuilding.save(b);	
+			return "Building correctly persisted on DB";
+		} else {
+			throw new EntityExistsException("Name: " + b.getName() + " already exists on Database");
+		}
 	}
 	
-	public void updateBuilding(Building b) {
-		repoBuilding.save(b);
-		log.info("Building correctly updated on DB");
+	public String updateBuilding(Building b) {
+		if (repoBuilding.existsById(b.getId())) {
+			repoBuilding.save(b);
+			return "Building correctly updated on DB";
+		} else {
+			throw new EntityNotFoundException("Building doesn't exists on Database");
+		}
 	}
 	
-	public void removeBuilding(Building b) {
-		repoBuilding.delete(b);
-		log.info("Building correctly removed from DB");
+	public String removeBuilding(Building b) {
+		if (repoBuilding.existsById(b.getId())) {
+			repoBuilding.delete(b);
+			return "Building correctly removed from Database";
+		} else {
+			throw new EntityNotFoundException("Building doesn't exists on Database");
+		}
 	}
 	
-	public void removeBuilding(Long id) {
-		repoBuilding.deleteById(id);
-		log.info("Building correctly removed from DB");
+	public String removeBuilding(Long id) {
+		if (repoBuilding.existsById(id)) {
+			repoBuilding.deleteById(id);
+			return "Building correctly removed from Database";
+		} else {
+			throw new EntityNotFoundException("Building doesn't exists on Database");
+		}
 	}
 	
 	public Building findById(Long id) {
-		return repoBuilding.findById(id).get();
+		if (repoBuilding.existsById(id)) {
+			return repoBuilding.findById(id).get();			
+		} else {
+			throw new EntityNotFoundException("Building doesn't exists on Database");
+		}
 	}
 	
 	public List<Building> findAllBuilding() {

@@ -16,8 +16,10 @@ public interface JpaBuildingRepository extends CrudRepository<Building, Long> {
 	
 	public List<Building> findByCity(String city);
 	
-	// complex finders
+	// exists
+	public boolean existsById(Long id);	
 	
+	public boolean existsByName(String name);	
 	
 	// custom queries
 	

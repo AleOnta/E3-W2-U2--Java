@@ -17,7 +17,7 @@ import com.api_rest.model.User;
 import com.api_rest.service.UserServices;
 
 @Controller
-@RequestMapping("/users")
+@RequestMapping("/E3W2U2/users")
 public class UserController {
 	
 	@Autowired UserServices userService;

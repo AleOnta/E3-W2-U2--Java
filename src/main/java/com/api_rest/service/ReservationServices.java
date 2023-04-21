@@ -15,6 +15,8 @@ import com.api_rest.repository.JpaReservationRepository;
 import com.api_rest.repository.JpaUserRepository;
 import com.api_rest.repository.JpaWorkstationRepository;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -114,49 +116,67 @@ public class ReservationServices {
 	
 	// Jpa methods
 	
-		public void persistReservation(Reservation r) {
+		public String persistReservation(Reservation r) {
 			boolean toGoUser = checkUserReservation(r);
 			boolean toGoWorkstat = checkWorkstationAvailability(r);
 			if (toGoUser && toGoWorkstat) {
 				repoReservation.save(r);
-				log.info("Reservation correctly persisted on DB");
 				updateWorkstationAvailability(r);
+				return "Reservation correctly persisted on DB";
 			} else {
 				log.warn("Unable create a new reservation:");
-				if (!toGoUser && toGoWorkstat) log.warn("User already has a reservation for that day"); 
-				else if (!toGoWorkstat && toGoUser) log.warn("Workstation already occupied in that day");
-				else log.warn("User already has a reservation for that day and workstation is already occupied!");
+				if (!toGoUser && toGoWorkstat) throw new EntityExistsException("User already has a reservation for that day"); 
+				else if (!toGoWorkstat && toGoUser) throw new EntityExistsException("Workstation already occupied in that day");
+				else throw new EntityExistsException("User already has a reservation for that day and workstation is already occupied!");
 			}
 		}
 			
-		public void updateReservation(Reservation r) {
-			boolean toGoUser = checkUserReservation(r);
-			boolean toGoWorkstat = checkWorkstationAvailabilityUpdate(r);
-			if (toGoUser && toGoWorkstat) {
-				repoReservation.save(r);
-				log.info("Reservation correctly updated on DB");
-				updateWorkstationAvailability(r);
+		public String updateReservation(Reservation r) {
+			if (repoReservation.existsById(r.getId())) {
+				boolean toGoUser = checkUserReservation(r);
+				boolean toGoWorkstat = checkWorkstationAvailabilityUpdate(r);
+				if (toGoUser && toGoWorkstat) {
+					repoReservation.save(r);
+					updateWorkstationAvailability(r);
+					return "Reservation correctly updated on DB";
+				} else {
+					log.warn("Unable update reservation:");
+					if (!toGoUser && toGoWorkstat) throw new EntityExistsException("User already has a reservation for that day"); 
+					else if (!toGoWorkstat && toGoUser) throw new EntityExistsException("Workstation already occupied in that day");
+					else throw new EntityExistsException("User already has a reservation for that day and workstation is already occupied!");
+				}
 			} else {
-				log.warn("Unable update reservation:");
-				if (!toGoUser && toGoWorkstat) log.warn("User already has a reservation for that day"); 
-				else if (!toGoWorkstat && toGoUser) log.warn("Workstation already occupied in that day");
-				else log.warn("User already has a reservation for that day and workstation is already occupied!");
+				throw new EntityNotFoundException("Reservation doesn't exists on Database");
 			}
 		}
 			
-		public void removeReservation(Reservation r) {
-			repoReservation.delete(r);
-			log.info("Reservation correctly removed from DB");
-			updateWorkstationAvailabilityOnDelete(r);
+		public String removeReservation(Reservation r) {
+			if (repoReservation.existsById(r.getId())) {
+				repoReservation.delete(r);
+				updateWorkstationAvailabilityOnDelete(r);
+				return "Reservation correctly removed from Database";
+			} else {
+				throw new EntityNotFoundException("Reservation doesn't exists on Database");
+			}
 		}
 		
-		public void removeReservation(Long id) {
-			Reservation r = findReservationById(id);
-			removeReservation(r);
+		public String removeReservation(Long id) {
+			if (repoReservation.existsById(id)) {
+				repoReservation.deleteById(id);
+				return "Reservation correctly removed from Database";
+			} else {
+				throw new EntityNotFoundException("Reservation doesn't exists on Database");
+			}
+			
 		}
 
 		public Reservation findReservationById(Long id) {
-			return repoReservation.findById(id).get();
+			if (repoReservation.existsById(id)) {
+				return repoReservation.findById(id).get();
+			} else {
+				throw new EntityNotFoundException("Reservation doesn't exists on Database");
+			}
+			
 		}
 		
 		public List<Reservation> findAllReservation() {

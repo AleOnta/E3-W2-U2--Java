@@ -3,6 +3,8 @@ package com.api_rest.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -20,6 +22,7 @@ import com.api_rest.service.UserServices;
 @RequestMapping("/E3W2U2/users")
 public class UserController {
 	
+	
 	@Autowired UserServices userService;
 	
 	@GetMapping("/{id}")
@@ -32,7 +35,12 @@ public class UserController {
 		return new ResponseEntity<List<User>>(userService.findAllUser(), HttpStatus.FOUND);
 	}
 	
-	@PostMapping
+	@GetMapping("/pageable")
+	public ResponseEntity<Page<User>> getAllUsersPaged(Pageable pageable) {
+		return new ResponseEntity<Page<User>>(userService.findAllUserPageable(pageable), HttpStatus.OK);
+	}
+	
+	@PostMapping()
 	public ResponseEntity<?> postNewUser(@RequestBody User user) {
 		return new ResponseEntity<String>(userService.persistUser(user), HttpStatus.CREATED);
 	}

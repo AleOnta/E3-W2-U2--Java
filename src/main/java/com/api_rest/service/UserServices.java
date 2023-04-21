@@ -4,9 +4,13 @@ import java.util.List;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.api_rest.model.User;
 import com.api_rest.repository.JpaUserRepository;
+import com.api_rest.repository.UserPageableRepository;
+
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -15,13 +19,15 @@ public class UserServices {
 
 	@Autowired private JpaUserRepository repoUser;
 	
+	@Autowired private UserPageableRepository repoPageableUser;
+	
 	@Autowired @Qualifier("fakeUser")
 	private ObjectProvider<User> fakeUser;
 	
 	// internal methods
 
-	public void createfakeUser() {
-		persistUser(fakeUser.getObject());
+	public String createfakeUser() {
+		return persistUser(fakeUser.getObject());
 	}
 	
 	// Jpa methods
@@ -75,6 +81,10 @@ public class UserServices {
 	
 	public List<User> findAllUser() {
 		return (List<User>) repoUser.findAll();
+	}
+	
+	public Page<User> findAllUserPageable(Pageable pageable) {
+		return (Page<User>) repoPageableUser.findAll(pageable);
 	}
 	
 	

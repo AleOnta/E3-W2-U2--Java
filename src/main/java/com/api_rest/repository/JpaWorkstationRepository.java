@@ -14,7 +14,8 @@ public interface JpaWorkstationRepository extends CrudRepository<Workstation, Lo
 	
 	public List<Workstation> findByType(E_WorkstationType type);
 	
-	// complex finders
+	// exists
+	public boolean existsById(Long id);
 	
 	// custom queries
 	

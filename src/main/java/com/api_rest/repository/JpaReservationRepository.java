@@ -17,4 +17,7 @@ public interface JpaReservationRepository extends CrudRepository<Reservation, Lo
 	
 	public List<Reservation> findByOwner(User owner);
 	
+	// exists
+	
+	public boolean existsById(Long id);
 }

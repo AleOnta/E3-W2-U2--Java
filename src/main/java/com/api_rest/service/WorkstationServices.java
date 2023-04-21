@@ -4,22 +4,28 @@ import java.util.List;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.api_rest.model.Building;
 import com.api_rest.model.E_WorkstationType;
 import com.api_rest.model.Workstation;
 import com.api_rest.repository.JpaBuildingRepository;
 import com.api_rest.repository.JpaWorkstationRepository;
+import com.api_rest.repository.WorkstationPageableRepository;
+
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
-@Slf4j
 public class WorkstationServices {
 	
 	// properties
 	
 	@Autowired 
 	private JpaWorkstationRepository repoWorkstation;
+	
+	@Autowired WorkstationPageableRepository repoPageWorkstation;
 	
 	@Autowired 
 	private JpaBuildingRepository repoBuilding;
@@ -38,37 +44,61 @@ public class WorkstationServices {
 	
 	// Jpa methods
 		
-	public void persistWorkstation(Workstation w) {
-		
+	public String persistWorkstation(Workstation w) {
 		repoWorkstation.save(w);
-		log.info("Workstation correctly persisted on DB");
+		return "Workstation correctly persisted on Database";
 	}
 		
-	public void updateWorkstation(Workstation w) {
-		repoWorkstation.save(w);
-		log.info("Workstation correctly updated on DB");
+	public String updateWorkstation(Workstation w) {
+		if (repoWorkstation.existsById(w.getId())) {
+			repoWorkstation.save(w);
+			return "Workstation correctly updated on Database";
+		} else {
+			throw new EntityNotFoundException("Workstation doesn't exists on Database");
+		}
 	}
 		
-	public void removeWorkstation(Workstation w) {
-		repoWorkstation.delete(w);
-		log.info("Workstation correctly removed from DB");
+	public String removeWorkstation(Workstation w) {
+		if (repoWorkstation.existsById(w.getId())) {
+			repoWorkstation.delete(w);
+			return "Workstation correctly deleted from Database";
+		} else {
+			throw new EntityNotFoundException("Workstation doesn't exists on Database");
+		}
 	}
 	
-	public void removeWorkstation(Long id) {
-		repoWorkstation.deleteById(id);
-		log.info("Workstation correctly removed from DB");
+	public String removeWorkstation(Long id) {
+		if (repoWorkstation.existsById(id)) {
+			repoWorkstation.deleteById(id);
+			return "Workstation correctly deleted from Database";
+		} else {
+			throw new EntityNotFoundException("Workstation doesn't exists on Database");
+		}
 	}
 
 	public Workstation findWorkstationById(Long id) {
-		return repoWorkstation.findById(id).get();
+		if (repoWorkstation.existsById(id)) {
+			return repoWorkstation.findById(id).get();
+		} else {
+			throw new EntityNotFoundException("Workstation doesn't exists on Database");
+		}
 	}
 	
 	public List<Workstation> findAllWorkstations() {
 		return (List<Workstation>) repoWorkstation.findAll();
 	}
+	
+	public Page<Workstation> findAllWorkstations(Pageable pageable) {
+		return (Page<Workstation>) repoPageWorkstation.findAll(pageable);
+	}
 
 	public List<Workstation> findWorkstationsByCity(String city) {
 		return (List<Workstation>) repoWorkstation.getByCity(city);
+	}
+	
+	// ON WORK
+	public Page<Workstation> findWorkstationsByCity(String city, Pageable pageable) {
+		return (Page<Workstation>) repoPageWorkstation.getByCity(city, pageable);
 	}
 	
 	public List<Workstation> findWorkstationsByType(E_WorkstationType type) {

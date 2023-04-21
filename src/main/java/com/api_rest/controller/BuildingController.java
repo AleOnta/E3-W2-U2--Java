@@ -2,6 +2,8 @@ package com.api_rest.controller;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import com.api_rest.model.Building;
+import com.api_rest.model.User;
 import com.api_rest.service.BuildingServices;
 
 
@@ -30,6 +33,11 @@ public class BuildingController {
 	@GetMapping
 	public ResponseEntity<?> getAllBuildings() {
 		return new ResponseEntity<List<Building>>(buildingService.findAllBuilding(), HttpStatus.FOUND);
+	}
+	
+	@GetMapping("/pageable")
+	public ResponseEntity<Page<Building>> getAllBuildingsPaged(Pageable pageable) {
+		return new ResponseEntity<Page<Building>>(buildingService.findAllPageableBuilding(pageable), HttpStatus.OK);
 	}
 	
 	@PostMapping

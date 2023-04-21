@@ -4,8 +4,11 @@ import java.util.List;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.api_rest.model.Building;
+import com.api_rest.repository.BuildingPageableRepository;
 import com.api_rest.repository.JpaBuildingRepository;
 
 import jakarta.persistence.EntityExistsException;
@@ -20,6 +23,8 @@ public class BuildingServices {
 	
 	@Autowired 
 	private JpaBuildingRepository repoBuilding;
+	
+	@Autowired BuildingPageableRepository repoPageBuilding;
 	
 	@Autowired @Qualifier("fakeBuilding")
 	private ObjectProvider<Building> fakeBuilding;
@@ -78,5 +83,9 @@ public class BuildingServices {
 	
 	public List<Building> findAllBuilding() {
 		return (List<Building>) repoBuilding.findAll();
+	}
+	
+	public Page<Building> findAllPageableBuilding(Pageable pageable) {
+		return (Page<Building>) repoPageBuilding.findAll(pageable);
 	}
 }

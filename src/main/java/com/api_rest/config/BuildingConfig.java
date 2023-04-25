@@ -32,7 +32,7 @@ public class BuildingConfig {
 	@Bean("paramsBuilding")
 	@Scope("prototype")
 	public Building paramsBuilding(String name, String address, String city) {
-		Building b = new Building(null, name, address, city);
+		Building b = Building.builder().name(name).address(address).city(city).build();
 		return b;
 	}
 	

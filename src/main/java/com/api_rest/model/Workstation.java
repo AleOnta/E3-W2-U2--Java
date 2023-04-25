@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -34,7 +35,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Builder
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Workstation {
 	
 	@Id
@@ -53,10 +53,12 @@ public class Workstation {
 	
 	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
 	@JoinColumn(name = "building_id")
+	@JsonIgnoreProperties({"address", "city", "workstationsOnSite"})
 	private Building building;
 	
 	@OneToMany(mappedBy = "location", cascade = {CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval = true)
-	private final List<Reservation> reservations = new ArrayList<Reservation>();
+	@JsonIgnoreProperties({"owner", "location"})
+	private List<Reservation> reservations = new ArrayList<Reservation>();
 
 	@Override
 	public String toString() {

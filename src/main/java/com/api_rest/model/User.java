@@ -28,7 +28,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class User {
 	
 	@Id
@@ -46,9 +45,10 @@ public class User {
 	
 	@Column(nullable = false, unique = true)
 	private String username;
-	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+	
+	@JsonIgnoreProperties({"owner", "location"})
 	@OneToMany(mappedBy = "owner", cascade = {CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval = true, fetch = FetchType.EAGER)
-	private final List<Reservation> reservations = new ArrayList<Reservation>();
+	private List<Reservation> reservations = new ArrayList<Reservation>();
 
 	private List<Long> getResIds() {
 		List<Long> resId = new ArrayList<Long>();

@@ -47,7 +47,7 @@ public class WorkstationConfig {
 	@Bean("paramsWorkstation")
 	@Scope("prototype")
 	public Workstation paramsWorkstation(String description, E_WorkstationType type, E_WorkstationStatus status, int max_sit, Building building) {
-		Workstation ws = new Workstation(null, description, type, status, max_sit, building);
+		Workstation ws = Workstation.builder().description(description).type(type).status(status).max_sit(max_sit).building(building).build();
 		return ws;
 	}
 	

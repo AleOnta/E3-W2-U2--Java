@@ -31,7 +31,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Reservation {
 	
 	@Id
@@ -40,12 +39,14 @@ public class Reservation {
 	
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "user_id")
+	@JsonIgnoreProperties({"name", "lastname", "email", "reservations"})
 	private User owner;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "w_stat_id")
+	@JsonIgnoreProperties({"description", "status", "building", "reservations"})
 	private Workstation location;
-
+	
 	private LocalDate date;
 
 	@Override

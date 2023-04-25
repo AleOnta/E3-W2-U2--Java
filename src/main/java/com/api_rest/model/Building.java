@@ -31,7 +31,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Building {
 	
 	@Id
@@ -48,6 +47,7 @@ public class Building {
 	private String city;
 	
 	@OneToMany(mappedBy = "building", cascade = {CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval = true, fetch = FetchType.EAGER)
-	private final List<Workstation> WorkstationsOnSite = new ArrayList<Workstation>();
+	@JsonIgnoreProperties({"building", "reservations"})
+	private List<Workstation> WorkstationsOnSite;
 	
 }

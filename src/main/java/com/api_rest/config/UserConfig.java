@@ -33,6 +33,6 @@ public class UserConfig {
 	public User paramsUser(String name, String lastname) {
 		String email =  name + "." + lastname + "@example.com";
 		String username = name + "_" + lastname;
-		return new User(null, name, lastname, email, username);
+		return User.builder().name(name).lastname(lastname).email(email).username(username).build();
 	}
 }
